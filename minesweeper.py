@@ -32,7 +32,7 @@ class Minesweeper(object):
         self.board = [ [] for d in range(dim)]
         for r in self.board:
             for i in range(dim):
-                r.append({'state': 'empty', 'adjacent_mines': 0})
+                r.append({'state': 'covered', 'adjacent_mines': 0, 'is_armed': False})
         for m in range(number_of_mines):
             x,y = (random.randint(0,dim-1),random.randint(0,dim-1))
             self.mines.add((x,y))
@@ -61,13 +61,16 @@ class Minesweeper(object):
         self.flags.append((y,x))
 
     def uncover_cell(self, x, y):
-        if self.board[y][x]['state'] == 'empty':
+        if self.board[y][x]['is_armed'] == False:
             self.board[y][x]['state'] = 'uncovered'
             self.uncover_empty_neighbors(y,x)
+        else:
+            self.board[x][y]['state'] = 'uncovered'
+            self._state = MinesweeperStates.game_lost
 
     def uncover_empty_neighbors(self, i, j):
         for r,c in get_neighbors(i,j, len(self.board)):
-            if self.board[r][c]['state'] == 'empty':
+            if self.board[r][c]['is_armed'] == False and self.board[r][c]['state'] == 'covered':
                 self.board[r][c]['state'] = 'uncovered'
                 self.uncover_empty_neighbors(r,c)
 
