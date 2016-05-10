@@ -1,5 +1,5 @@
 import random
-
+from enum import Enum
 def get_neighbors(i, j, n):
     def within_bounds(row, col):
         return (row,col) != (i,j) and row >= 0 and row < n and col >= 0 and col < n
@@ -12,6 +12,12 @@ def get_neighbors(i, j, n):
                 neighbors.append((r,c))
     return neighbors
 
+class MinesweeperStates(Enum):
+    new_game = 1
+    in_progress = 2
+    game_lost = 3
+    game_won = 4
+
 class Minesweeper(object):
     grid_repr = {'empty': 'X', 'uncovered': '.', 'marked': 'M', 'armed': '*'}
     def compute_mine_adjacency(self):
@@ -20,6 +26,8 @@ class Minesweeper(object):
                 self.board[cell[0]][cell[1]]['adjacent_mines'] = self.board[cell[0]][cell[1]]['adjacent_mines'] + 1
 
     def __init__(self, dim, number_of_mines):
+        self._state = MinesweeperStates.new_game
+        print(self._state)
         self.mines = []
         self.board = [ [] for d in range(dim)]
         for r in self.board:
@@ -34,8 +42,8 @@ class Minesweeper(object):
     def show(self):
         print ("  " + "".join([' {} '.format(i) for i in range(len(self.board))]))
 
-        for row, i in zip(self.board, range(len(self.board))):
-            print("{} ".format(i) + "".join([' {} '.format(Minesweeper.grid_repr[cell['state']]) for cell in row]))
+        for row, row_number in zip(self.board, range(len(self.board))):
+            print("{} ".format(row_number) + "".join([' {} '.format(Minesweeper.grid_repr[cell['state']]) for cell in row]))
 
         # for row in self.board:
         #     print([item['adjacent_mines'] for item in row])
