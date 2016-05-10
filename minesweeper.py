@@ -19,7 +19,7 @@ class MinesweeperStates(Enum):
     game_won = 4
 
 class Minesweeper(object):
-    grid_repr = {'empty': 'X', 'uncovered': '.', 'marked': 'M', 'armed': '*'}
+    grid_repr = {'empty': 'X', 'uncovered': '.', 'marked': 'M', 'covered': '_', 'armed': '*'}
     def compute_mine_adjacency(self):
         for mine in self.mines:
             for cell in get_neighbors(mine[0], mine[1], len(self.board)):
@@ -28,15 +28,18 @@ class Minesweeper(object):
     def __init__(self, dim, number_of_mines):
         self._state = MinesweeperStates.new_game
         print(self._state)
-        self.mines = []
+        self.mines = set([])
         self.board = [ [] for d in range(dim)]
         for r in self.board:
             for i in range(dim):
                 r.append({'state': 'empty', 'adjacent_mines': 0})
         for m in range(number_of_mines):
             x,y = (random.randint(0,dim-1),random.randint(0,dim-1))
-            self.mines.append((x,y))
-            self.board[x][y]['state'] = 'armed'
+            self.mines.add((x,y))
+            # self.board[x][y]['state'] = 'armed'
+            self.board[x][y]['is_armed'] = True
+        self.flags = []
+        self.remaining_flags = number_of_mines
         self.compute_mine_adjacency()
 
     def show(self):
@@ -49,6 +52,13 @@ class Minesweeper(object):
         #     print([item['adjacent_mines'] for item in row])
 
         # print(self.mines)
+
+    def mark_cell(self, x, y):
+        # update cell.state
+        self.board[y][x]['state'] = 'marked'
+        # update remaining flags
+        self.remaining_flags = self.remaining_flags - 1
+        self.flags.append((y,x))
 
     def uncover_cell(self, x, y):
         if self.board[y][x]['state'] == 'empty':
