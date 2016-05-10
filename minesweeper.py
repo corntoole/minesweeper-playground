@@ -1,4 +1,17 @@
 import random
+
+def get_neighbors(i, j, n):
+    def within_bounds(row, col):
+        return (row,col) != (i,j) and row >= 0 and row < n and col >= 0 and col < n
+    neighbors = []
+    for r in range(i-1, i+2, 1):
+#         print('r ',r, 'i', i)
+        for c in range(j-1, j+2, 1):
+#             print('c ', c)
+            if within_bounds(r,c):
+                neighbors.append((r,c))
+    return neighbors
+
 class Minesweeper(object):
     grid_repr = {'empty': 'X', 'uncovered': '.', 'marked': 'M', 'armed': '*'}
     def compute_mine_adjacency(self):
@@ -19,13 +32,15 @@ class Minesweeper(object):
         self.compute_mine_adjacency()
 
     def show(self):
-        for row in self.board:
-            print([Minesweeper.grid_repr[item['state']] for item in row])
+        print ("  " + "".join([' {} '.format(i) for i in range(len(self.board))]))
 
-        for row in self.board:
-            print([item['adjacent_mines'] for item in row])
+        for row, i in zip(self.board, range(len(self.board))):
+            print("{} ".format(i) + "".join([' {} '.format(Minesweeper.grid_repr[cell['state']]) for cell in row]))
 
-        print(self.mines)
+        # for row in self.board:
+        #     print([item['adjacent_mines'] for item in row])
+
+        # print(self.mines)
 
     def uncover_cell(self, x, y):
         if self.board[y][x]['state'] == 'empty':
@@ -50,5 +65,3 @@ class MinesweeperGenerationalUncover(Minesweeper):
             if self.board[r][c]['state'] == 'empty':
                 self.board[r][c]['state'] = 'uncovered'
                 self.uncover_empty_neighbors(r,c, depth-1)
-            else:
-                pass
