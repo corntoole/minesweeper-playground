@@ -112,7 +112,7 @@ class Minesweeper(object):
             self.uncover_empty_neighbors(y,x)
             self._state = MinesweeperStates.in_progress
         else:
-            self.board[x][y]['state'] = 'uncovered'
+            self.board[y][x]['state'] = 'uncovered'
             self._state = MinesweeperStates.game_lost
 
     def uncover_empty_neighbors(self, i, j):
