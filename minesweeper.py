@@ -1,5 +1,6 @@
 import random
 from enum import Enum
+import re
 def get_neighbors(i, j, n):
     def within_bounds(row, col):
         return (row,col) != (i,j) and row >= 0 and row < n and col >= 0 and col < n
@@ -169,3 +170,28 @@ def test2(dim = 7, num_mines = 10):
         mine.show()
         if mine.is_game_over():
             return
+
+
+def main():
+    num_of_mines = 7
+    board_dimension = 5
+    game = Minesweeper(board_dimension, num_of_mines)
+    user_action = None
+    two_digit_pattern = re.compile(r'(\d+)\s+(\d+)')
+    game.show()
+    while not game.is_game_over():
+        print("Please enter a column number(x coord) and row number(y coord) for the cell you would like to act upon:")
+        cell_str = input()
+        cell_input_match = two_digit_pattern.match(cell_str)
+        while cell_input_match is None:
+            print('Try again: enter a cell coordinate as two integers between 0 and {}:'.format(board_dimension-1))
+            cell_str = input()
+            cell_input_match = two_digit_pattern.match(cell_str)
+        [col_number, row_number] = map(int, cell_input_match.groups())
+        print("What action would you like to perform on cell {} , {}? (m)ark or (u)ncover:".format(col_number, row_number))
+        action = input()
+        if action[0].lower() == 'm':
+            game.mark_cell(col_number, row_number)
+        else:
+            game.uncover_cell(col_number, row_number)
+        game.show()
