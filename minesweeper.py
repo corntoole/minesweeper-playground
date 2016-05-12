@@ -145,6 +145,8 @@ class Minesweeper(object):
 
     def uncover_empty_neighbors(self, i, j):
         for r,c in get_neighbors(i,j, len(self.board)):
+            if self.board[r][c]['is_armed']:
+                return
             if self.board[r][c]['is_armed'] == False and self.board[r][c]['state'] == 'covered':
                 self.board[r][c]['state'] = 'uncovered'
                 self._number_of_empty_cells = self._number_of_empty_cells - 1
