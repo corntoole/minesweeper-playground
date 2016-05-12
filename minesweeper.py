@@ -20,7 +20,7 @@ class MinesweeperStates(Enum):
     game_won = 4
 
 class Minesweeper(object):
-    grid_repr = {'empty': 'X', 'uncovered': '.', 'marked': 'M', 'covered': '_', 'armed': '*'}
+    grid_repr = {'empty': '◼', 'uncovered': '.', 'marked': 'M', 'covered': '_', 'armed': '*'}
     def compute_mine_adjacency(self):
         for mine in self.mines:
             for cell in get_neighbors(mine[0], mine[1], len(self.board)):
@@ -45,15 +45,15 @@ class Minesweeper(object):
 
     def _render_cell(self, cell):
         if self._state is MinesweeperStates.new_game:
-            return '_'
+            return '◼'
         elif self._state is MinesweeperStates.in_progress:
             if cell['state'] == 'covered':
-                return '_'
+                return '◼'
             elif cell['state'] == 'uncovered':
                 if cell['adjacent_mines'] > 0:
                     return str(cell['adjacent_mines']) # show number of adjacent mines
                 else:
-                    return 'X'
+                    return '.'
             else: # then cell['state'] == 'marked'
                 return 'M'
         elif self._state is MinesweeperStates.game_lost:
