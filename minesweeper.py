@@ -104,9 +104,6 @@ class Minesweeper(object):
         return len(self.mines - self.flags) is 0
 
     def mark_cell(self, x, y):
-        if self.remaining_flags == 0:
-            print('No more flags, unflag some other cell')
-            return
         # update cell.state
         if self._state is MinesweeperStates.new_game:
             self._state = MinesweeperStates.in_progress
@@ -117,6 +114,9 @@ class Minesweeper(object):
             self.remaining_flags = self.remaining_flags + 1
             self.flags.remove((y,x))
         elif cell_state == 'covered':
+            if self.remaining_flags == 0:
+                print('No more flags, unflag some other cell')
+                return
             self.board[y][x]['state'] = 'marked'
             # update remaining flags
             self.remaining_flags = self.remaining_flags - 1
@@ -193,8 +193,8 @@ def test2(dim = 7, num_mines = 10):
 
 
 def main():
-    num_of_mines = 7
-    board_dimension = 5
+    num_of_mines = 5
+    board_dimension = 7
     game = Minesweeper(board_dimension, num_of_mines)
     user_action = None
     two_digit_pattern = re.compile(r'(\d+)\s+(\d+)')
