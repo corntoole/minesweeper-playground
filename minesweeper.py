@@ -27,13 +27,16 @@ class Minesweeper(object):
                 self.board[cell[0]][cell[1]]['adjacent_mines'] = self.board[cell[0]][cell[1]]['adjacent_mines'] + 1
 
     def __init__(self, dim, number_of_mines):
+        self.num_rows = dim
+        self.num_cols = dim
         self._state = MinesweeperStates.new_game
-        print(self._state)
+        # print(self._state)
         self.mines = set([])
         self.board = [ [] for d in range(dim)]
         for r in self.board:
             for i in range(dim):
                 r.append({'state': 'covered', 'adjacent_mines': 0, 'is_armed': False})
+        random.seed()
         for m in range(number_of_mines):
             x,y = (random.randint(0,dim-1),random.randint(0,dim-1))
             while (x,y) in self.mines:
@@ -45,6 +48,12 @@ class Minesweeper(object):
         self.remaining_flags = number_of_mines
         self._number_of_empty_cells = (dim * dim) - len(self.mines)
         self.compute_mine_adjacency()
+
+    def get_num_rows(self):
+       return self.num_rows
+
+    def get_num_cols(self):
+        return self.num_cols
 
     def _render_cell(self, cell):
         if self._state is MinesweeperStates.new_game:
@@ -151,6 +160,9 @@ class Minesweeper(object):
                 self.board[r][c]['state'] = 'uncovered'
                 self._number_of_empty_cells = self._number_of_empty_cells - 1
                 self.uncover_empty_neighbors(r,c)
+
+    def get_results(self):
+        return {'outcome' : self._state.name, 'remaining_flags' : self.remaining_flags, 'number_of_empty_cells' : self._number_of_empty_cells}
 
 # Trying to verify that adjacent empty cells are being uncovered correctly
 class MinesweeperGenerationalUncover(Minesweeper):
