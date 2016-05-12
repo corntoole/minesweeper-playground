@@ -39,7 +39,7 @@ class Minesweeper(object):
             self.mines.add((x,y))
             # self.board[x][y]['state'] = 'armed'
             self.board[x][y]['is_armed'] = True
-        self.flags = []
+        self.flags = set([])
         self.remaining_flags = number_of_mines
         self.compute_mine_adjacency()
 
@@ -72,8 +72,10 @@ class Minesweeper(object):
                 else:
                     return 'X'
                 return 'u'
+        else:
+            return Minesweeper.grid_repr[cell['state']]
     def is_game_over(self):
-        return self._state == MinesweeperStates.game_lost
+        return self._state == MinesweeperStates.game_lost or self._state == MinesweeperStates.game_won
 
     def show(self):
         print ("  " + "".join([' {} '.format(i) for i in range(len(self.board))]))
@@ -98,14 +100,32 @@ class Minesweeper(object):
     #         pass
     #     else:
     #         pass
+    def _are_all_mines_flagged(self):
+        return len(self.mines - self.flags) is 0
+
     def mark_cell(self, x, y):
+        if self.remaining_flags == 0:
+            print('No more flags, unflag some other cell')
+            return
         # update cell.state
-        self.board[y][x]['state'] = 'marked'
         if self._state is MinesweeperStates.new_game:
             self._state = MinesweeperStates.in_progress
-        # update remaining flags
-        self.remaining_flags = self.remaining_flags - 1
-        self.flags.append((y,x))
+
+        cell_state = self.board[y][x]['state']
+        if cell_state == 'marked':
+            self.board[y][x]['state'] = 'covered'
+            self.remaining_flags = self.remaining_flags + 1
+            self.flags.remove((y,x))
+        elif cell_state == 'covered':
+            self.board[y][x]['state'] = 'marked'
+            # update remaining flags
+            self.remaining_flags = self.remaining_flags - 1
+            self.flags.add((y,x))
+            if self._are_all_mines_flagged():
+                self._state = MinesweeperStates.game_won
+        else:
+            print('Error: cannot mark or unmark an empty cell.')
+
 
     def uncover_cell(self, x, y):
         if self.board[y][x]['is_armed'] == False:
