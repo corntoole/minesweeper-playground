@@ -41,6 +41,7 @@ class Minesweeper(object):
             self.board[x][y]['is_armed'] = True
         self.flags = set([])
         self.remaining_flags = number_of_mines
+        self._number_of_empty_cells = (dim * dim) - number_of_mines
         self.compute_mine_adjacency()
 
     def _render_cell(self, cell):
@@ -83,7 +84,7 @@ class Minesweeper(object):
         for row, row_number in zip(self.board, range(len(self.board))):
             print("{} ".format(row_number) + "".join([' {} '.format(self._render_cell(cell)) for cell in row]))
 
-        print (self._state)
+        print (self._state, "Number of remaining empty cells: {}".format(self._number_of_empty_cells))
 
         # for row in self.board:
         #     print([item['adjacent_mines'] for item in row])
@@ -128,10 +129,14 @@ class Minesweeper(object):
 
 
     def uncover_cell(self, x, y):
+        if self._state == MinesweeperStates.new_game:
+            self._state = MinesweeperStates.in_progress
         if self.board[y][x]['is_armed'] == False:
             self.board[y][x]['state'] = 'uncovered'
+            self._number_of_empty_cells = self._number_of_empty_cells - 1
             self.uncover_empty_neighbors(y,x)
-            self._state = MinesweeperStates.in_progress
+            if self._number_of_empty_cells == 0:
+                self._state = MinesweeperStates.game_won
         else:
             self.board[y][x]['state'] = 'uncovered'
             self._state = MinesweeperStates.game_lost
@@ -140,6 +145,7 @@ class Minesweeper(object):
         for r,c in get_neighbors(i,j, len(self.board)):
             if self.board[r][c]['is_armed'] == False and self.board[r][c]['state'] == 'covered':
                 self.board[r][c]['state'] = 'uncovered'
+                self._number_of_empty_cells = self._number_of_empty_cells - 1
                 self.uncover_empty_neighbors(r,c)
 
 # Trying to verify that adjacent empty cells are being uncovered correctly
@@ -193,8 +199,8 @@ def test2(dim = 7, num_mines = 10):
 
 
 def main():
-    num_of_mines = 5
-    board_dimension = 7
+    num_of_mines = 10
+    board_dimension = 9
     game = Minesweeper(board_dimension, num_of_mines)
     user_action = None
     two_digit_pattern = re.compile(r'(\d+)\s+(\d+)')
