@@ -36,12 +36,14 @@ class Minesweeper(object):
                 r.append({'state': 'covered', 'adjacent_mines': 0, 'is_armed': False})
         for m in range(number_of_mines):
             x,y = (random.randint(0,dim-1),random.randint(0,dim-1))
+            while (x,y) in self.mines:
+                x,y = (random.randint(0,dim-1),random.randint(0,dim-1))
             self.mines.add((x,y))
             # self.board[x][y]['state'] = 'armed'
             self.board[x][y]['is_armed'] = True
         self.flags = set([])
         self.remaining_flags = number_of_mines
-        self._number_of_empty_cells = (dim * dim) - number_of_mines
+        self._number_of_empty_cells = (dim * dim) - len(self.mines)
         self.compute_mine_adjacency()
 
     def _render_cell(self, cell):
@@ -200,7 +202,7 @@ def test2(dim = 7, num_mines = 10):
 
 def main():
     num_of_mines = 10
-    board_dimension = 9
+    board_dimension = 10
     game = Minesweeper(board_dimension, num_of_mines)
     user_action = None
     two_digit_pattern = re.compile(r'(\d+)\s+(\d+)')
