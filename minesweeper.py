@@ -6,9 +6,7 @@ def get_neighbors(i, j, n):
         return (row,col) != (i,j) and row >= 0 and row < n and col >= 0 and col < n
     neighbors = []
     for r in range(i-1, i+2, 1):
-#         print('r ',r, 'i', i)
         for c in range(j-1, j+2, 1):
-#             print('c ', c)
             if within_bounds(r,c):
                 neighbors.append((r,c))
     return neighbors
@@ -97,21 +95,7 @@ class Minesweeper(object):
 
         print (self._state, "Number of remaining empty cells: {}".format(self._number_of_empty_cells))
 
-        # for row in self.board:
-        #     print([item['adjacent_mines'] for item in row])
 
-        # print(self.mines)
-    # def update_state(self, operation):
-    #     if self._state is MinesweeperStates.new_game:
-    #         if operation is 'mark':
-    #             self._state = MinesweeperStates.in_progress
-    #
-    #     elif self._state is MinesweeperStates.in_progress:
-    #         pass
-    #     elif self._state is MinesweeperStates.game_lost:
-    #         pass
-    #     else:
-    #         pass
     def _are_all_mines_flagged(self):
         return len(self.mines - self.flags) is 0
 
@@ -163,6 +147,9 @@ class Minesweeper(object):
 
     def get_results(self):
         return {'outcome' : self._state.name, 'remaining_flags' : self.remaining_flags, 'number_of_empty_cells' : self._number_of_empty_cells}
+
+    def get_board(self):
+        return [[ (cell['state'], cell['adjacent_mines']) for cell in row] for row in self.board]
 
 # Trying to verify that adjacent empty cells are being uncovered correctly
 class MinesweeperGenerationalUncover(Minesweeper):
