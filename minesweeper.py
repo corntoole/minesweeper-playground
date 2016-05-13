@@ -44,6 +44,7 @@ class Minesweeper(object):
         for r in self.board:
             for i in range(dim):
                 r.append({'state': 'covered', 'adjacent_mines': 0, 'is_armed': False})
+        self._num_of_mines = number_of_mines
         random.seed()
         for m in range(number_of_mines):
             x,y = (random.randint(0,dim-1),random.randint(0,dim-1))
@@ -55,6 +56,29 @@ class Minesweeper(object):
         self.flags = set([])
         self.remaining_flags = number_of_mines
         self._number_of_empty_cells = (dim * dim) - len(self.mines)
+        self.compute_mine_adjacency()
+
+    def new_game(self):
+        self._state = MinesweeperStates.new_game
+        for row in self.board:
+            # print (row)
+            for cell in row:
+                # print(cell)
+                cell['state'] = 'covered'
+                cell['adjacent_mines'] = 0
+                cell['is_armed'] = False
+        random.seed()
+        self.mines.clear()
+        for m in range(self._num_of_mines):
+            x,y = (random.randint(0,self.num_rows-1),random.randint(0,self.num_cols-1))
+            while (x,y) in self.mines:
+                x,y = (random.randint(0,self.num_rows-1),random.randint(0,self.num_cols-1))
+            self.mines.add((x,y))
+            # self.board[x][y]['state'] = 'armed'
+            self.board[x][y]['is_armed'] = True
+        self.flags.clear()
+        self.remaining_flags = self._num_of_mines
+        self._number_of_empty_cells = (self.num_rows * self.num_cols) - len(self.mines)
         self.compute_mine_adjacency()
 
     def get_num_rows(self):
