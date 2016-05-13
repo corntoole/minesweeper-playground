@@ -259,3 +259,7 @@ def main():
         else:
             game.uncover_cell(col_number, row_number)
         game.show()
+
+
+if __name__ == '__main__':
+    main()
