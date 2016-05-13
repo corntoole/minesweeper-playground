@@ -17,6 +17,16 @@ class MinesweeperStates(Enum):
     game_lost = 3
     game_won = 4
 
+class Cell(object):
+    def __init__(self, x, y, state, n):
+        self.x = x
+        self.y = y
+        self.state = state
+        self.num_adjacent_mines = n
+
+    def __repr__(self):
+        return "({},{}), state: {}, n: {}".format(self.x,self.y, self.state, self.num_adjacent_mines)
+
 class Minesweeper(object):
     grid_repr = {'empty': '◼', 'uncovered': '.', 'marked': 'M', 'covered': '_', 'armed': '*'}
     def compute_mine_adjacency(self):
@@ -149,7 +159,8 @@ class Minesweeper(object):
         return {'outcome' : self._state.name, 'remaining_flags' : self.remaining_flags, 'number_of_empty_cells' : self._number_of_empty_cells}
 
     def get_board(self):
-        return [[ (cell['state'], cell['adjacent_mines']) for cell in row] for row in self.board]
+        # return [[ (cell['state'], cell['adjacent_mines']) for cell in row] for row in self.board]
+        return [[ Cell(x,y,cell['state'], cell['adjacent_mines']) for cell, x in zip(row, range(len(row)))] for row, y in zip(self.board, range(len(self.board)))]
 
 # Trying to verify that adjacent empty cells are being uncovered correctly
 class MinesweeperGenerationalUncover(Minesweeper):
