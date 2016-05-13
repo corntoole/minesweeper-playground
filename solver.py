@@ -26,7 +26,7 @@ class Solver(object):
 		self.bottom_right = (self.num_rows - 1, self.num_cols - 1)
 		self.bottom_left  = (self.num_rows - 1, 0)
 
-	def start(self):
+	def solve(self):
 		num_rows = self.game.get_num_rows()
 		num_cols = self.game.get_num_cols()
 		random.seed()
@@ -69,7 +69,7 @@ class Solver2(Solver):
 		(x,y) = self.corner_dict[corner]
 		self.game.uncover_cell(x,y)
 
-	def start(self):
+	def solve(self):
 		num_rows = self.game.get_num_rows()
 		num_cols = self.game.get_num_cols()
 		random.seed()
@@ -92,10 +92,10 @@ def main():
 	game = Minesweeper(10, 10)
 	solver = Solver2(game)
 	t1 = time.time()
-	solver.start()
+	solver.solve()
 	for i in range(99999):
 		game = Minesweeper(10, 10)
 		solver.set_game(game)
-		solver.start()
+		solver.solve()
 	t2 = time.time()
 	print("Losses: {}, Wins: {} in {} seconds".format(solver._losses, solver._wins, t2 - t1))
