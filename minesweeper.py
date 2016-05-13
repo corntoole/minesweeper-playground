@@ -2,13 +2,13 @@ import random
 from enum import Enum
 import re
 def get_neighbors(i, j, n):
-    def within_bounds(row, col):
-        return (row,col) != (i,j) and row >= 0 and row < n and col >= 0 and col < n
+    # def within_bounds(row, col):
+    #     return (row,col) != (i,j) and row >= 0 and row < n and col >= 0 and col < n
     neighbors = []
-    for r in range(i-1, i+2, 1):
-        for c in range(j-1, j+2, 1):
-            if within_bounds(r,c):
-                neighbors.append((r,c))
+    for row in range(i-1, i+2, 1):
+        for col in range(j-1, j+2, 1):
+            if (row,col) != (i,j) and row >= 0 and row < n and col >= 0 and col < n:
+                neighbors.append((row,col))
     return neighbors
 
 class MinesweeperStates(Enum):
@@ -93,7 +93,7 @@ class Minesweeper(object):
         for row, row_number in zip(self.board, range(len(self.board))):
             print("{} ".format(row_number) + "".join([' {} '.format(self._render_cell(cell)) for cell in row]))
 
-        print (self._state, "Number of remaining empty cells: {}".format(self._number_of_empty_cells))
+        print (self._state, "\nNumber of remaining empty cells: {}\nNumber of remaining flags: {}".format(self._number_of_empty_cells, self.remaining_flags))
 
 
     def _are_all_mines_flagged(self):
