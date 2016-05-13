@@ -2,6 +2,8 @@ from minesweeper import Minesweeper, get_neighbors
 import random
 import time
 from enum import Enum
+import sys
+from optparse import OptionParser
 
 class Solver(object):
 	def __init__(self, game):
@@ -25,6 +27,9 @@ class Solver(object):
 		self.top_right =    (0, self.num_cols - 1)
 		self.bottom_right = (self.num_rows - 1, self.num_cols - 1)
 		self.bottom_left  = (self.num_rows - 1, 0)
+
+	def new_game(self):
+		self.game.new_game()
 
 	def solve(self):
 		num_rows = self.game.get_num_rows()
@@ -132,14 +137,63 @@ class Solver2(Solver):
 		else:
 			self._losses = self._losses + 1
 
-def main():
+def main(num_runs=1000):
 	game = Minesweeper(10, 10)
 	solver = Solver2(game)
 	t1 = time.time()
 	solver.solve()
-	for i in range(99999):
+	for i in range(num_runs-1):
 		game = Minesweeper(10, 10)
 		solver.set_game(game)
 		solver.solve()
 	t2 = time.time()
 	print("Losses: {}, Wins: {} in {} seconds".format(solver._losses, solver._wins, t2 - t1))
+	return "Losses: {}, Wins: {} in {} seconds".format(solver._losses, solver._wins, t2 - t1)
+
+
+def parallel(n_jobs=2, num_runs=1000):
+	from multiprocessing import Pool
+	p = Pool(n_jobs)
+
+	p.map(main, [num_runs//n_jobs for i in range(n_jobs)])
+
+
+
+if __name__ == '__main__':
+
+	usage = "usage: %prog [options]"
+	parser = OptionParser()
+	parser.add_option("-s", "--solver", dest="solver",
+						help="which solver: random or basic [default: basic]", default="basic")
+	parser.add_option("-j", "--num-jobs", type="int", dest="n_jobs", help="how many processes to run [default: 1]", default=1)
+	parser.add_option("-n", "--num-games", type="int", dest="num_runs", help="how many games to play [default: 1000]", default=1000)
+
+	(options, args) = parser.parse_args()
+
+	_opts = options.__dict__
+
+	# if len(sys.argv) > 1:
+	n_jobs = _opts['n_jobs']
+	num_runs = _opts['num_runs']
+	solver_type = _opts['solver']
+
+	def f(n, which_solver=solver_type):
+		gm = Minesweeper(10, 10)
+		if which_solver is 'basic':
+			s = Solver2(gm)
+		else:
+			s = Solver(gm)
+		for i in range(n):
+			s.solve()
+			s.new_game()
+		return {'wins': s._wins, 'losses': s._losses}
+
+	from multiprocessing import Pool
+	from functools import reduce
+	p = Pool(n_jobs)
+
+	t1 = time.time()
+	results = p.map(f, [num_runs//n_jobs for i in range(n_jobs)])
+	t2 = time.time()
+	aggregate_results = reduce(lambda x,y: {'wins': x['wins']+y['wins'], 'losses': x['losses']+y['losses']}, results, {'wins': 0, 'losses': 0})
+	print("Wins: {}, Losses: {}, in {} seconds".format(aggregate_results['wins'], aggregate_results['losses'], t2 - t1))
