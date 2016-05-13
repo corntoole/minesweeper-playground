@@ -121,7 +121,7 @@ class Minesweeper(object):
             self.flags.remove((y,x))
         elif cell_state == 'covered':
             if self.remaining_flags == 0:
-                print('No more flags, unflag some other cell')
+                # print('No more flags, unflag some other cell')
                 return
             self.board[y][x]['state'] = 'marked'
             # update remaining flags
